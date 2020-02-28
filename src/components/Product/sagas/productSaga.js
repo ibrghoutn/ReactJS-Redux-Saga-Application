@@ -1,110 +1,86 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
-import { SET_PRODUCTS, GET_PRODUCTS, GET_PRODUCT, SET_PRODUCT, PUT_PRODUCT, POST_PRODUCT, DELETE_PRODUCT, CANCEL_PRODUCT_UPDATE, EDIT_PRODUCT, SET_EDIT_MODE } from '../constants/types';
-import Axios from 'axios';
 
-export const watchGetUsers = function* () {
-  yield takeEvery(GET_PRODUCTS, workerGetUsers);
+import {PRODUCTS, ONEPRODUCT } from '../constants/types';
+
+import history from '../../../history';
+
+import {deleteOneProduct, fetchProducts, getOneProduct, updateOneProduct, AddProduct } from '../actions/productActions';
+
+export const watchGetProducts = function* () {
+  yield takeEvery(PRODUCTS.LOAD, workerGetproducts);
 }
 
-function* workerGetUsers() {
+function* workerGetproducts() {
   console.log('get products');
   try {
-    const uri = 'http://localhost:8080/products';
-    const result = yield call(Axios.get, uri);
-    yield put({ type: SET_PRODUCTS, value: result.data._embedded.products });
-  } 
-  catch {
-    console.log('Failed');
+    const products = yield call(fetchProducts, 'products');
+    yield put({ type: PRODUCTS.LOAD_SUCCESS, products: products });
+  } catch (error) {
+    // dispatch error action
+    yield put({ type: PRODUCTS.LOAD_FAIL, error: error });
   }
 }
 
-export const watchGetUser = function* () {
-  yield takeEvery(GET_PRODUCT, workerGetUser);
+export const watchDeleteProduct = function* () {
+  yield takeEvery(ONEPRODUCT.DELETE_SUCCESS, workerDeleteproducts);
 }
 
-function* workerGetUser(action) {
+function* workerDeleteproducts(action) {
+  console.log('DELETE one product');
+
+  try {
+    yield call(deleteOneProduct, action.value);
+    const products = yield call(fetchProducts, 'products');
+    yield put({ type: PRODUCTS.LOAD_SUCCESS, products: products });
+  } catch (error) {
+    // dispatch error action
+    yield put({ type: PRODUCTS.LOAD_FAIL, error: error });
+  }
+}
+
+export const watchGetProduct = function* () {
+  yield takeEvery(ONEPRODUCT.LOAD, workerGetproduct);
+}
+
+function* workerGetproduct(action) {
   console.log('get one product');
+
   try {
-    const uri = `http://localhost:8080/products/${action.value}`;
-    const result = yield call(Axios.get, uri);
-    yield put({ type: SET_PRODUCT, value: result.data });
-  } 
-  catch {
-    console.log('Failed');
+    const product = yield call(getOneProduct, action.value);
+    yield put({ type: ONEPRODUCT.LOAD_SUCCESS, product: product });
+  } catch (error) {
+    // dispatch error action
+    yield put({ type: ONEPRODUCT.LOAD_FAIL, error: error });
   }
 }
 
-export const watchDeleteUser = function* () {
-  yield takeEvery(DELETE_PRODUCT, workerDeleteUser);
+export const watchUpdateProduct = function* () {
+  yield takeEvery(ONEPRODUCT.UPDATE_SUCCESS, workerUpdateproduct);
 }
 
-function* workerDeleteUser(action) {
-  console.log('Deleting a product');
-  
-  try {
-    if(window.confirm(`you are deleting project task ${action.value} this action can not be undone`)){
-      const uri = `http://localhost:8080/products/${action.value}`;
-      yield call(Axios.delete, uri);
-      yield put({ type: GET_PRODUCTS});
-      console.log('Deleted a user successfully');
-    }
+function* workerUpdateproduct(action) {
+  console.log('update one product');
 
-  } 
-  catch {
-    console.log('Failed');
+  try {
+    yield call(updateOneProduct, action.value);
+    history.push('/');
+  } catch (error) {
+    // dispatch error action
+    yield put({ type: ONEPRODUCT.LOAD_FAIL, error: error });
   }
 }
 
-export const watchPostUser = function* () {
-  yield takeEvery(POST_PRODUCT, workerPostUser);
+export const watchPostProduct = function* () {
+  yield takeEvery(ONEPRODUCT.POST_SUCCESS, workerPostproduct);
 }
 
-export const watchPutUser = function* () {
-  yield takeEvery(PUT_PRODUCT, workerPutUser);
-}
+function* workerPostproduct(action) {
+  console.log('Add new product');
 
-
-
-export const watchEditUser = function* () {
-  yield takeEvery(EDIT_PRODUCT, workerEditUser);
-}
-
-export const watchCancelUserUpdate = function* () {
-  yield takeEvery(CANCEL_PRODUCT_UPDATE, workerCancelUserUpdate);
-}
-
-function* workerPostUser(action) {
-  console.log('Adding a product');
   try {
-    const uri = 'http://localhost:8080/products';
-    yield call(Axios.post, uri, action.value);
-    yield put({ type: GET_PRODUCTS});
-    console.log('Added a user successfullt');
-  } 
-  catch {
-    console.log('Failed');
+    yield call(AddProduct, action.value);
+    history.push('/');
+  } catch (error) {
+    console.log(error.toString());
   }
-} 
-
-function* workerPutUser(action) {
-  console.log('Updating a product');
-  try {
-    const uri = `http://localhost:8080/products/${action.value.id}`;
-    yield call(Axios.put, uri, action.value);
-    yield put({ type: GET_PRODUCTS});
-    console.log('Updated a user successfully');
-  } 
-  catch {
-    console.log('Failed');
-  }
-} 
-
-function* workerEditUser(action) {
-  console.log('Editing a product', action);
-    yield put({ type: SET_EDIT_MODE, value:{productId: action.value, editMode: true}});
-} 
-
-function* workerCancelUserUpdate(action) {
-  console.log('Cancelled a product edit');
-    yield put({ type: SET_EDIT_MODE, value:{productId: action.value, editMode: false}});
-} 
+}

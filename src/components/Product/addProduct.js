@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-import { POST_PRODUCT } from './constants/types';
+import { ONEPRODUCT } from './constants/types';
 
 class Addproduct extends Component {
 
@@ -15,17 +15,7 @@ class Addproduct extends Component {
         };
 
         this.onChange = this.onChange.bind(this);
-
-    }
-
-    componentWillReceiveProps(nextProps){
-
-        if (nextProps.errors) {
-            this.setState({
-                errors : nextProps.errors,
-            })
-            
-        }
+        this.onSubmit = this.onSubmit.bind(this);
 
     }
 
@@ -35,10 +25,18 @@ class Addproduct extends Component {
         })
     };
 
-    addUser = () => {
-        this.props.addUser(
-            { designation: this.state.designation, price: this.state.price, quantity: this.state.quantity }
-            );
+    onSubmit(e){
+        e.preventDefault();
+
+        const newProjectTask = {
+            designation : this.state.designation,
+            price : this.state.price,
+            quantity : this.state.quantity,
+        };
+
+        this.props.addProduct(newProjectTask);
+
+
     }
 
     render() {
@@ -53,7 +51,7 @@ class Addproduct extends Component {
                     Back to Board
                     </Link>
                         <h4 className="display-4 text-center">Add /Update Product</h4>
-
+                        <form onSubmit={this.onSubmit}>
                             <div className="form-group">
                                 <input type="text" className="form-control form-control-lg"
                                 name="designation" placeholder="Product Designation"
@@ -70,7 +68,8 @@ class Addproduct extends Component {
                                 value = {this.state.quantity} onChange={this.onChange} />
                             </div>
 
-                            <button className="btn btn-primary btn-block mt-4" onClick={this.addUser}>Add Product</button>
+                            <input type="submit" className="btn btn-primary btn-block mt-4" value="Update Product" />
+                        </form>
                     </div>
                 </div>
             </div>
@@ -80,18 +79,12 @@ class Addproduct extends Component {
     }
 }
 
-const mapStateTopProps = (state) => {
-    return {
-
-    }
-  }
-  
   const mapDispatchToProps = (dispatch) => {
     return {
-      addUser: (product) => {
-        dispatch({ type: POST_PRODUCT, value: product });
+      addProduct: (product) => {
+        dispatch({ type: ONEPRODUCT.POST_SUCCESS, value: product });
       }
     }
   }
-  
-  export default connect(mapStateTopProps, mapDispatchToProps)(Addproduct);
+
+  export default connect(null, mapDispatchToProps)(Addproduct);

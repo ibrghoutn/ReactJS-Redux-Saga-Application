@@ -2,24 +2,82 @@ import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { GET_PRODUCTS, DELETE_PRODUCT } from './constants/types';
+import {ONEPRODUCT, PRODUCTS} from './constants/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faPlusCircle } from '@fortawesome/fontawesome-free-solid';
 
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+
 class ProductList extends Component {
 
     componentDidMount() {
-        this.props.getUsers();
-        
+        this.props.getProducts();
+    }
+
+    chargeChart = () => {
+        const { products } = this.props;
+        const dataChart = [];
+        const dataxAis = [];
+
+        products.map(prod => {
+            dataChart.push(prod.quantity);
+            dataxAis.push(prod.designation);
+
+            return null;
+        });
+
+        const options = {
+            title: {
+                text: 'Chart for product quantities'
+            },
+
+            xAxis: {
+                categories: dataxAis,
+            },
+
+            yAxis: {
+                alternateGridColor: '#b7cff7',
+                title: {
+                    text: 'Quantity value'
+                }
+            },
+
+            series: [{
+                data: dataChart,
+                zones: [
+                    {
+                        value: 50,
+                        color: 'red'
+                    },
+                    {
+                        value: 200,
+                        color: 'green'
+                    },
+                    {
+                        color: 'yellow'
+                    },
+                ]
+            }],
+        }
+
+        return(
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={options}
+            />
+        );
     }
 
     deleteUser = (product) => {
-        this.props.deleteUser(product.id);
+        this.props.deleteProduct(product.id);
     }
 
     render(){
+
         const { products } = this.props;
+
         let BoardContent;
 
         const BoardAlgorithm = products => {
@@ -32,7 +90,7 @@ class ProductList extends Component {
             }
 
             else{
-                const rows = products.map(product => 
+                const rows = products.map(product =>
                     <tr key={product.id}>
                     <th scope="row">{product.id}</th>
                     <td>{product.designation}</td>
@@ -42,17 +100,15 @@ class ProductList extends Component {
                     <Link to={`/updateProduct/${product.id}`} className="btn btn-primary">
                      <FontAwesomeIcon icon={faEdit} />
                     </Link>
-                    <button className="btn btn-danger ml-4" 
+                    <button className="btn btn-danger ml-4"
                     onClick={() => { this.deleteUser(product) }}
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
-                        
-                        
                     </td>
                     </tr>
                 );
-    
+
                 return(
                         <table className="table col-md-10 text-center">
                             <thead className="thead-light">
@@ -69,7 +125,7 @@ class ProductList extends Component {
                             </tbody>
                         </table>
                 );
-    
+
             }
         };
 
@@ -85,8 +141,13 @@ class ProductList extends Component {
                 <br />
                 <hr />
                 {BoardContent}
+                <br />
+                <br />
+                <hr />
+
+                {this.chargeChart()}
             </div>
-                    
+
             );
 
     }
@@ -94,20 +155,20 @@ class ProductList extends Component {
 
 const mapStateTopProps = (state) => {
     return {
-      products: state.product_red
+      products: state.product_red.products
     }
   }
-  
+
   const mapDispatchToProps = (dispatch) => {
     return {
-      getUsers: () => {
-        dispatch({ type: GET_PRODUCTS });
+      getProducts: () => {
+        dispatch({ type: PRODUCTS.LOAD });
       },
 
-      deleteUser: (productId) => {
-        dispatch({ type: DELETE_PRODUCT, value: productId });
+      deleteProduct: (productId) => {
+        dispatch({ type: ONEPRODUCT.DELETE_SUCCESS, value: productId });
       },
     }
   }
-  
+
   export default connect(mapStateTopProps, mapDispatchToProps)(ProductList);

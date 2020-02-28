@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 
-import { GET_PRODUCT, PUT_PRODUCT, CANCEL_PRODUCT_UPDATE } from './constants/types';
+import { ONEPRODUCT } from './constants/types';
 
 class updateProduct extends Component {
 
@@ -27,7 +27,7 @@ class updateProduct extends Component {
             this.setState({
                 errors : nextProps.errors,
             })
-            
+
         }
 
         const {
@@ -47,7 +47,8 @@ class updateProduct extends Component {
 
     componentDidMount() {
         const {productId} = this.props.match.params;
-        this.props.getUser(productId);
+        this.props.getProduct(productId);
+
     }
 
     onChange(e) {
@@ -55,10 +56,6 @@ class updateProduct extends Component {
             [e.target.name]:e.target.value
         })
     };
-
-    updateUser = (product) => {
-        this.props.updateUser(product);
-    }
 
     onSubmit(e){
         e.preventDefault();
@@ -70,9 +67,9 @@ class updateProduct extends Component {
             quantity : this.state.quantity,
         };
 
-        this.props.AddProduct(updatedproduct, this.props.history);
-        
-        
+        this.props.updateProduct(updatedproduct);
+
+
     }
 
     render() {
@@ -87,6 +84,7 @@ class updateProduct extends Component {
                     Back to Board
                     </Link>
                         <h4 className="display-4 text-center">Add /Update Product</h4>
+                        <form onSubmit={this.onSubmit}>
                             <div className="form-group">
                                 <input type="text" className="form-control form-control-lg"
                                 name="designation" placeholder="Product Designation"
@@ -103,14 +101,8 @@ class updateProduct extends Component {
                                 value = {this.state.quantity} onChange={this.onChange} />
                             </div>
 
-                            <button className="btn btn-primary btn-block mt-4" onClick={() => { this.updateUser(
-                                {
-                                    id: this.state.id,
-                                    designation :this.state.designation,
-                                    price:this.state.price,
-                                    quantity: this.state.quantity
-                                }
-                                ) }}>Update</button>
+                            <input type="submit" className="btn btn-primary btn-block mt-4" value="Update Product" />
+                        </form>
                     </div>
                 </div>
             </div>
@@ -119,27 +111,22 @@ class updateProduct extends Component {
         );
     }
 }
-  
+
 const mapStateTopProps = (state) => {
     return {
-      product: state.product_red
+      product: state.product_red.product,
     }
   }
-  
+
   const mapDispatchToProps = (dispatch) => {
     return {
-      getUser: (productId) => {
-        dispatch({ type: GET_PRODUCT, value: productId });
+      getProduct: (productId) => {
+        dispatch({ type: ONEPRODUCT.LOAD, value: productId });
       },
-      updateUser: (product) => {     
-        console.log('dispatch update', product) 
-        dispatch({ type: PUT_PRODUCT, value: product });
+      updateProduct: (product) => {
+        dispatch({ type: ONEPRODUCT.UPDATE_SUCCESS, value: product });
       },
-      cancelUpdate: (productId) => {
-        dispatch({ type: CANCEL_PRODUCT_UPDATE, value: productId });
-      },
-
     }
   }
-  
+
   export default connect(mapStateTopProps, mapDispatchToProps)(updateProduct);

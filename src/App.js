@@ -2,12 +2,14 @@ import React from 'react';
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from './components/NavBar/Navbar';
-import { BrowserRouter as Router, Route} from 'react-router-dom';
+import { Router, Route} from 'react-router-dom';
 import ProductList from './components/Product/ProductList';
 import { Provider } from 'react-redux';
 import configureStore from './store';
 import updateProduct from './components/Product/updateProduct';
 import addProduct from './components/Product/addProduct';
+
+import history from './history';
 
 const store = configureStore();
 
@@ -16,7 +18,7 @@ function App() {
 
     <Provider store={store}>
 
-      <Router>
+        <Router history={history}>
 
       <div className="App">
 
