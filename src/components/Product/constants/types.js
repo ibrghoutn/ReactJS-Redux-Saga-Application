@@ -1,0 +1,15 @@
+export const GET_PRODUCTS = 'GET_PRODUCTS';
+export const SET_PRODUCTS = 'SET_PRODUCTS';
+
+export const GET_PRODUCT = 'GET_PRODUCT';
+export const SET_PRODUCT = 'SET_PRODUCT';
+
+export const POST_PRODUCT = 'POST_PRODUCT';
+
+export const PUT_PRODUCT = 'PUT_PRODUCT';
+
+export const DELETE_PRODUCT = 'DELETE_PRODUCT';
+
+export const EDIT_PRODUCT = 'EDIT_PRODUCT';
+export const CANCEL_PRODUCT_UPDATE = 'CANCEL_PRODUCT_UPDATE';
+export const SET_EDIT_MODE = 'SET_EDIT_MODE';
